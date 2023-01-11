@@ -1,0 +1,40 @@
+<launch>
+    <!-- parameters -->
+    <arg name = "rosbag_file" value = "/home/point/stereo_bagdata/2022-12-27-18-10-01.bag" />
+    <arg name="iris_config_path" default = "$(find iris)/../config/iris_stereo_basler.yaml" /> 
+    <arg name="vslam_config_path" default = "$(find iris)/../orbslam2_bridge/3rd/ORB_SLAM2/Examples/Stereo/basler2.yaml" />
+
+    <arg name="pcd_path" default = "$(find iris)/../../../0.25_all_points.pcd" /> 
+    <arg name="vocab_file" default = "$(find iris)/../orbslam2_bridge/3rd/ORB_SLAM2/Vocabulary/ORBvoc.txt" />
+
+    <arg name="is_image_compressed" default = "true"/>
+    <arg name="is_image_color" default = "false"/>
+    <arg name="online_rectification" default = "true"/>
+
+    <arg name="image_topic_name0" default = "/camera/left/image_raw/compressed" />
+    <arg name="image_topic_name1" default = "/camera/right/image_raw/compressed" />
+
+    <arg name="keyframe_recollection" default = "20" />
+    
+    <!-- iris_node -->
+    <node name="iris_node" pkg="iris" type="iris_node" output="screen">
+        <param name="iris_config_path" type="string" value="$(arg iris_config_path)" />
+        <param name="pcd_path" type="string" value="$(arg pcd_path)" />
+    </node>
+
+    <node name="orbslam2_stereo_bridge_node" pkg="orbslam2_bridge" type="orbslam2_stereo_bridge_node" output="screen">
+        <param name="vslam_config_path" type="string" value="$(arg vslam_config_path)" />
+        <param name="vocab_path" type="string" value="$(arg vocab_file)" />
+        <param name="image_topic_name0" type="string" value="$(arg image_topic_name0)" />
+        <param name="image_topic_name1" type="string" value="$(arg image_topic_name1)" />
+        <param name="is_image_compressed" type="bool" value="$(arg is_image_compressed)" />
+        <param name="is_image_color" type="bool" value="$(arg is_image_color)" />
+        <param name="keyframe_recollection" type="int" value="$(arg keyframe_recollection)" />
+        <param name="online_rectification" type="bool" value="$(arg online_rectification)" />
+    </node>
+
+    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find iris)/../config/iris.rviz" />
+    <node name="republish_left" pkg="image_transport" type="republish" output="screen" args="raw in:=/camera/left/image_raw compressed out:=/camera/left/image_raw" />
+    <node name="republish_right" pkg="image_transport" type="republish" output="screen" args="raw in:=/camera/right/image_raw compressed out:=/camera/right/image_raw" />
+    <node name="player" pkg="rosbag" type="play" args="--clock -r 1.0 $(arg rosbag_file)" cwd="node" required="true" />
+</launch>

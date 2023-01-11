@@ -1,0 +1,28 @@
+# transform of camera 
+# Init.transform: [ 27.9402, -8.93671, 0.0]
+# Init.transform: [ 9.34325, -0.692886, 0.0]
+Init.transform: [ 0, 0, 0.0]
+
+# normal vector of camera
+Init.normal: [ 1.0, 0.0, 0.0]
+# upper vector of camera
+Init.upper: [ 0, 0, 1]
+# scale
+Init.scale: 1.0
+
+Iris.scale_gain: 500.00
+Iris.smooth_gain: 0.0
+Iris.latitude_gain: 0.0
+Iris.altitude_gain: 0.0
+
+Iris.distance_min: 4.0
+Iris.distance_max: 10.0
+
+Iris.iteration: 5
+Iris.converge_translation: 0.05
+Iris.converge_rotation: 0.01
+
+# Map Parameter
+Map.voxel_grid_leaf: 1.00
+Map.submap_grid_leaf: 30
+Map.normal_search_leaf: 1.8
