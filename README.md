@@ -3,6 +3,7 @@
 
 # *Iris*
 * Visual localization in pre-build pointcloud maps.
+* **ORB_SLAM2** can be used.
 * ~~**OpenVSLAM** and **VINS-mono**  can be used.~~ <span style="color: orange;">Modifications are underway.</span>
 
 
@@ -12,6 +13,7 @@
 
 ## Submodule 
 * [OpenVSLAM forked by MapIV](https://github.com/MapIV/openvslam.git)
+* [ORB_SLAM2 forked by linjohnss](https://github.com/linjohnss/ORB_SLAM2.git)
 > ~~[original repository (xdspacelab)](https://github.com/xdspacelab/openvslam)~~
 
 
@@ -31,7 +33,7 @@ If you are using ROS, you only need to install `g2o` and `DBoW2`.
 ```bash
 mkdir -p catkin_ws/src
 cd catkin_ws/src
-git clone --recursive https://github.com/MapIV/iris.git
+git clone --recursive https://github.com/linjohnss/iris.git
 cd ..
 catkin_make
 ```
@@ -65,6 +67,11 @@ rosbag play kitti_00_stereo.bag # (on another terminal)
 ```
 > If the estimated position is misaligned, it can be corrected using `2D Pose Estimate` in rviz.
 
+#### ORBSLAM2
+```bash
+roslaunch iris mono_kitti00_orbslam2.launch
+roslaunch iris stereo_kitti00_orbslam2.launch
+```
 
 ## How to Run with Your Data
 ### All you need to prepare
