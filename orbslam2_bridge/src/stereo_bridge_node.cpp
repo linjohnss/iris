@@ -16,7 +16,13 @@
 #include <message_filters/time_synchronizer.h>
 
 using namespace std;
-
+class FramePoint
+{
+  public:
+  Eigen::Matrix4f transMatrix = Eigen::Matrix4f::Identity(4,4);
+  pcl::PointCloud<pcl::PointXYZINormal>::Ptr cloud{new pcl::PointCloud<pcl::PointXYZINormal>};
+};
+vector<FramePoint> framepoint;
 void publishPose(const Eigen::Matrix4f& T, const std::string& child_frame_id);
 
 int main(int argc, char **argv)
@@ -134,14 +140,15 @@ int main(int argc, char **argv)
             
             
             // process ORB_SLAM2
+            Eigen::Matrix4f eigen_mat;
             if(!cur_pose.empty()) {
-                Eigen::Matrix4f eigen_mat;
                 cv::cv2eigen(cur_pose, eigen_mat);
                 publishPose(eigen_mat.inverse(), "iris/vslam_pose");
             }
             if(SLAM.GetTrackingState() == ORB_SLAM2::Tracking::OK) {
                 {
                     cv::Mat track_img;
+
                     drawKeypoints(subscribed_image0, SLAM.GetTrackedKeyPointsUn(), track_img, cv::Scalar(0,255,0));
                     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", track_img).toImageMsg();
                     image_publisher.publish(msg);
@@ -158,15 +165,40 @@ int main(int argc, char **argv)
                     {
                         if(trackedPoint[i]) {
                             cv::Mat point = trackedPoint[i]->GetWorldPos();
-                            pcl::PointXYZINormal p;
-                            p.x = static_cast<float>(point.at<float>(0));
-                            p.y = static_cast<float>(point.at<float>(1));
-                            p.z = static_cast<float>(point.at<float>(2));
-                            float weight = 1.0f;
-                            p.intensity = weight;
-                            vslam_data->push_back(p);
+                            Eigen::Vector3f eigen_point;
+                            cv::cv2eigen(point, eigen_point);
+                            float dist = fabs((eigen_point - eigen_mat.inverse().block<3,1>(0,3)).norm());
+                            if (dist < 30 && dist > 2) {
+                                pcl::PointXYZINormal p;
+                                p.x = static_cast<float>(point.at<float>(0));
+                                p.y = static_cast<float>(point.at<float>(1));
+                                p.z = static_cast<float>(point.at<float>(2));
+                                float weight = static_cast<float>(1.0 - dist * 0.2);
+                                p.intensity = weight;
+                                vslam_data->push_back(p);
+                            }
                         }
                     }
+                    if (framepoint.size() == 0) {
+                        FramePoint currentpoint;
+                        currentpoint.cloud->points.clear();
+                        currentpoint.cloud->points.assign(vslam_data->points.begin(),vslam_data->points.end()); 
+                        currentpoint.transMatrix = eigen_mat.inverse();
+                        framepoint.push_back(currentpoint);
+                    }
+                    else if (fabs((eigen_mat.inverse().block<3,1>(0,3) - framepoint.back().transMatrix.block<3,1>(0,3)).norm()) > 5) {
+                        FramePoint currentpoint;
+                        currentpoint.cloud->points.clear();
+                        currentpoint.cloud->points.assign(vslam_data->points.begin(),vslam_data->points.end()); 
+                        currentpoint.transMatrix = eigen_mat.inverse();
+                        framepoint.push_back(currentpoint);
+                        if(framepoint.size() > 4) 
+                            framepoint.erase(framepoint.begin());
+                    }
+                    for (int i=0; i<framepoint.size(); i++) {
+                        *vslam_data += *framepoint[i].cloud;
+                    }
+
                     pcl_conversions::toPCL(process_stamp, vslam_data->header.stamp);
                     vslam_data->header.frame_id = "world";
                     vslam_publisher.publish(vslam_data);
@@ -176,7 +208,7 @@ int main(int argc, char **argv)
             // Inform processing time
             std::stringstream ss;
             long time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - m_start).count();
-            ss << "processing time= \033[35m"
+            ss << "orb processing time= \033[35m"
                 << time_ms
                 << "\033[m ms";
             ROS_INFO("%s", ss.str().c_str());

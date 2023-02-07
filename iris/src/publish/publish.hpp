@@ -35,6 +35,7 @@ namespace iris
 void publishImage(image_transport::Publisher& publisher, const cv::Mat& image);
 
 void publishPose(const Eigen::Matrix4f& T, const std::string& child_frame_id);
+void publishOdom(ros::Publisher& publisher, const Eigen::Matrix4f& T);
 void publishPointcloud(ros::Publisher& publisher, const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud);
 void publishPath(ros::Publisher& publisher, const std::vector<Eigen::Vector3f, Eigen::aligned_allocator<Eigen::Vector3f>>& path);
 void publishCorrespondences(ros::Publisher& publisher,

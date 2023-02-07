@@ -26,6 +26,7 @@
 #include "publish/publish.hpp"
 #include "core/util.hpp"
 #include <nav_msgs/Path.h>
+#include <nav_msgs/Odometry.h>
 #include <visualization_msgs/Marker.h>
 #include <visualization_msgs/MarkerArray.h>
 
@@ -57,6 +58,26 @@ void publishPose(const Eigen::Matrix4f& T, const std::string& child_frame_id)
   tf::Transform transform;
   transform.setFromOpenGLMatrix(util::normalizePose(T).cast<double>().eval().data());
   br.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "world", child_frame_id));
+}
+
+void publishOdom(ros::Publisher& publisher, const Eigen::Matrix4f& T)
+{
+  nav_msgs::Odometry odom;
+  odom.header.stamp = ros::Time::now();
+  odom.header.frame_id = "world";
+
+  odom.pose.pose.position.x = T(0,3);
+  odom.pose.pose.position.y = T(1,3);
+  odom.pose.pose.position.z = T(2,3);
+
+  Eigen::Quaternionf q;
+  q = T.block<3,3>(0,0);
+  odom.pose.pose.orientation.x = q.x();
+  odom.pose.pose.orientation.y = q.y();
+  odom.pose.pose.orientation.z = q.z();
+  odom.pose.pose.orientation.w = q.w();
+
+  publisher.publish(odom);
 }
 
 void publishPointcloud(ros::Publisher& publisher, const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud)

@@ -32,6 +32,7 @@
 #include <geometry_msgs/PoseWithCovarianceStamped.h>
 #include <image_transport/image_transport.h>
 #include <nav_msgs/Path.h>
+#include <nav_msgs/Odometry.h>
 #include <pcl_ros/point_cloud.h>
 #include <ros/ros.h>
 #include <std_msgs/Float32.h>
@@ -123,6 +124,8 @@ int main(int argc, char* argv[])
   ros::Publisher source_pc_publisher = nh.advertise<pcl::PointCloud<pcl::PointXYZI>>("iris/source_pointcloud", 1);
   ros::Publisher iris_path_publisher = nh.advertise<nav_msgs::Path>("iris/iris_path", 1);
   ros::Publisher vslam_path_publisher = nh.advertise<nav_msgs::Path>("iris/vslam_path", 1);
+  ros::Publisher iris_odom_publisher = nh.advertise<nav_msgs::Odometry>("iris/iris_odom", 1);
+  ros::Publisher vslam_odom_publisher = nh.advertise<nav_msgs::Odometry>("iris/vslam_odom", 1);
   ros::Publisher correspondences_publisher = nh.advertise<visualization_msgs::Marker>("iris/correspondences", 1);
   ros::Publisher scale_publisher = nh.advertise<std_msgs::Float32>("iris/align_scale", 1);
   ros::Publisher processing_time_publisher = nh.advertise<std_msgs::Float32>("iris/processing_time", 1);
@@ -224,6 +227,8 @@ int main(int argc, char* argv[])
 
     iris::publishPose(offseted_vslam_pose, "iris/offseted_vslam_pose");
     iris::publishPose(iris_pose, "iris/iris_pose");
+    iris::publishOdom(vslam_odom_publisher, offseted_vslam_pose);
+    iris::publishOdom(iris_odom_publisher, iris_pose);
 
 
     // Spin and wait

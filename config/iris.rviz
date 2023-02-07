@@ -6,7 +6,6 @@ Panels:
       Expanded:
         - /Grid1/Offset1
         - /target_points1/Autocompute Value Bounds1
-        - /TF1/Frames1
         - /correspondences1/Namespaces1
       Splitter Ratio: 0.3891128897666931
     Tree Height: 442
@@ -339,7 +338,7 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 85.97160339355469
+      Distance: 144.66746520996094
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
@@ -347,9 +346,9 @@ Visualization Manager:
         Value: false
       Field of View: 0.7853981852531433
       Focal Point:
-        X: 9.065216064453125
-        Y: 9.812643051147461
-        Z: -17.23028564453125
+        X: 26.413217544555664
+        Y: 17.386436462402344
+        Z: -17.212825775146484
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false

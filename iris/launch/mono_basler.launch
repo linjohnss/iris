@@ -18,25 +18,15 @@
         <param name="pcd_path" type="string" value="$(arg pcd_path)" />
     </node>
 
-    <!-- openvslam_bridge_node -->
-    <!-- <node name="openvslam_bridge_node" pkg="openvslam_bridge" type="openvslam_bridge_node" output="screen">
-       <param name="vslam_config_path" type="string" value="$(arg vslam_config_path)" />
-       <param name="vocab_path" type="string" value="$(arg vocab_file)" />
-       <param name="image_topic_name0" type="string" value="$(arg image_topic_name0)" />
-       <param name="is_image_compressed" type="bool" value="$(arg is_image_compressed)" />
-       <param name="is_image_color" type="bool" value="$(arg is_image_color)" />
-       <param name="keyframe_recollection" type="int" value="$(arg keyframe_recollection)" />
-    </node> -->
-    <node name="ros_mono" pkg="orbslam2_bridge" type="ros_mono" output="screen">
-       <param name="vslam_config_path" type="string" value="$(arg vslam_config_path)" />
-       <param name="vocab_path" type="string" value="$(arg vocab_file)" />
-       <param name="image_topic_name0" type="string" value="$(arg image_topic_name0)" />
-       <param name="is_image_compressed" type="bool" value="$(arg is_image_compressed)" />
-       <param name="is_image_color" type="bool" value="$(arg is_image_color)" />
-       <param name="keyframe_recollection" type="int" value="$(arg keyframe_recollection)" />
-    </node>
+   <node name="orbslam2_bridge_node" pkg="orbslam2_bridge" type="orbslam2_bridge_node" output="screen">
+      <param name="vslam_config_path" type="string" value="$(arg vslam_config_path)" />
+      <param name="vocab_path" type="string" value="$(arg vocab_file)" />
+      <param name="image_topic_name0" type="string" value="$(arg image_topic_name0)" />
+      <param name="is_image_compressed" type="bool" value="$(arg is_image_compressed)" />
+      <param name="is_image_color" type="bool" value="$(arg is_image_color)" />
+      <param name="keyframe_recollection" type="int" value="$(arg keyframe_recollection)" />
+   </node>
 
-    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find iris)/../config/iris.rviz" />
-    <!-- <node name="republish_left" pkg="image_transport" type="republish" output="screen" args="raw in:=/camera/left/image_raw compressed out:=/camera/left/image_raw" /> -->
-     <node name="player" pkg="rosbag" type="play" args="--clock -r 0.5 $(arg rosbag_file)" cwd="node" required="true" />
+   <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find iris)/../config/iris.rviz" />
+   <node name="player" pkg="rosbag" type="play" args="--clock -r 0.5 $(arg rosbag_file)" cwd="node" required="true" />
 </launch>

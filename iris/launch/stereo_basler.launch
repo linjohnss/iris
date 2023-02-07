@@ -1,10 +1,12 @@
 <launch>
     <!-- parameters -->
-    <arg name = "rosbag_file" value = "/home/point/stereo_bagdata/2022-12-27-18-10-01.bag" />
+    <arg name = "rosbag_file" value = "/home/point/stereo_bagdata/2022-12-27-18-22-49.bag" />
+    <arg name = "rosbag_file_lidar" value = "$(find iris)/../../../basement4/odom.bag" />
     <arg name="iris_config_path" default = "$(find iris)/../config/iris_stereo_basler.yaml" /> 
     <arg name="vslam_config_path" default = "$(find iris)/../orbslam2_bridge/3rd/ORB_SLAM2/Examples/Stereo/basler2.yaml" />
+    <arg name = "visualization" value = "true" />
 
-    <arg name="pcd_path" default = "$(find iris)/../../../0.25_all_points.pcd" /> 
+    <arg name="pcd_path" default = "$(find iris)/../../../basement4/feature.pcd" /> 
     <arg name="vocab_file" default = "$(find iris)/../orbslam2_bridge/3rd/ORB_SLAM2/Vocabulary/ORBvoc.txt" />
 
     <arg name="is_image_compressed" default = "true"/>
@@ -32,9 +34,13 @@
         <param name="keyframe_recollection" type="int" value="$(arg keyframe_recollection)" />
         <param name="online_rectification" type="bool" value="$(arg online_rectification)" />
     </node>
-
-    <node name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find iris)/../config/iris.rviz" />
+    <!-- <param name="/use_sim_time" value="true" /> -->
+    <node if="$(arg visualization)" name="rvizvisualisation" pkg="rviz" type="rviz" output="log" args="-d $(find iris)/../config/iris.rviz" />
     <node name="republish_left" pkg="image_transport" type="republish" output="screen" args="raw in:=/camera/left/image_raw compressed out:=/camera/left/image_raw" />
     <node name="republish_right" pkg="image_transport" type="republish" output="screen" args="raw in:=/camera/right/image_raw compressed out:=/camera/right/image_raw" />
-    <node name="player" pkg="rosbag" type="play" args="--clock -r 1.0 $(arg rosbag_file)" cwd="node" required="true" />
+    <!-- <node pkg="tf" type="static_transform_publisher" name="lidar_visual_link" args="0 0 0 0 0 0 camera_init world  100" /> -->
+    <node name="player" pkg="rosbag" type="play" args="--clock -r 0.8 $(arg rosbag_file)" />
+    <node name="player2" pkg="rosbag" type="play" args="--clock -r 0.8 $(arg rosbag_file_lidar)" />
+
+
 </launch>
